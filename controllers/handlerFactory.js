@@ -6,6 +6,7 @@ const { ApiFeatures } = require("../utils/apiFeatures");
 exports.deleteFactoey = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
+    console.log(id);
     const model = await Model.findById(id);
     if (!model) {
       return next(new ApiError("this document is not exist", 404));

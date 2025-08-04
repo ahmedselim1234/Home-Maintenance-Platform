@@ -56,7 +56,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
-  res.json({ accessToken, email });
+  res.json({ accessToken, email,userId: user._id ,userRole: user.role});
 });
 
 exports.forgetPassword = asyncHandler(async (req, res, next) => {
