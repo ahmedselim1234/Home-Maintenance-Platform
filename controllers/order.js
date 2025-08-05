@@ -2,8 +2,11 @@ const asyncHandler = require("express-async-handler");
 const factoryHandlers = require("./handlerFactory");
 const Order = require("../models/order");
 const Service = require("../models/service");
+const { ApiError } = require("../middleware/errorHandler");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-exports.createServiceOrOrder = asyncHandler(async (req, res, next) => {
+
+exports.createServiceCashOrOrder = asyncHandler(async (req, res, next) => {
   const { paymentMethodType, shippingAddress } = req.body;
   const serviceId = req.params.serviceId;
   const taxPrice = 0;
@@ -103,13 +106,13 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(Id);
   if (!order) {
     return next(new Error("Order not found"));
-  } 
-  if(order.accepted === false) {
+  }
+  if (order.accepted === false) {
     return next(new Error("Order must be accepted before completion"));
   }
-    order.isCompleted = true;
-    order.completedAt = Date.now();
-    await order.save();
+  order.isCompleted = true;
+  order.completedAt = Date.now();
+  await order.save();
 
   res.status(200).json({
     status: "success",
@@ -119,7 +122,60 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
   });
 });
 
+// admin
+exports.getAllOrders = asyncHandler(async (req, res, next) => {
+  const orders = await Order.find()
+    .populate("service", "name price image technicain")
+    .populate("user", "name email");
 
+  if (!orders || orders.length === 0) {
+    return next(new Error("No orders found"));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: orders.length,
+    data: {
+      orders,
+    },
+  });
+});
 
 // Delete order (commented out as per original code)
 exports.deleteOrder = factoryHandlers.deleteFactoey(Order);
+
+// Checkout session
+exports.checkOutSession = asyncHandler(async (req, res, next) => {
+   const taxPrice = 0;
+
+  //get order
+  const service=await Service.findById(req.params.serviceId);
+  if(!service) return next(new ApiError('this order is not exist',400));
+
+  const totalOrderPrice=taxPrice+service.price;
+
+   const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        price_data: {
+          currency: "egp",
+          unit_amount: Math.round(totalOrderPrice * 100),
+          product_data: {
+            name: req.user.name,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${req.protocol}://${req.get("host")}/v1/orders/userOrders`,
+    cancel_url: `${req.protocol}://${req.get("host")}/v1/services/${req.params.serviceId}`,
+    customer_email: req.user.email,
+    client_reference_id: String(service._id),
+    // metadata: req.body.shippingAddress,
+  });
+
+  res.status(200).json({ session });
+
+
+});
