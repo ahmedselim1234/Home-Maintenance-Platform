@@ -7,26 +7,28 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { ApiError, HandleError } = require("./middleware/errorHandler");
-// const {webhookCheckout}=require('./controllers/order')
+const {webhookCheckout}=require('./controllers/order')
 
 
-
+ 
 const app = express();
 const port = process.env.PORT || 4000;
 
-// app.post(
-//   "/webhook-checkout",
-//   express.raw({ type: "application/json" }),
-//   webhookCheckout
-// );
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
+
+
 
 // Middlewares
 app.use(cors());
 app.use(cookieParser());
-app.use(express.json({limit: "1kb"})); // Limit the size of JSON payloads
-app.use(express.urlencoded({ limit: "1kb", extended: true })); // Limit the size of URL-encoded payloads
+app.use(express.json()); // Limit the size of JSON payloads
+app.use(express.urlencoded({  extended: true })); // Limit the size of URL-encoded payloads
 app.use(express.static(path.join(__dirname, "uploads")));
-
+ 
 
 
 if (process.env.NODE_ENV === "development") {
