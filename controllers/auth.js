@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const Tokens = require('csrf');
+const tokens = new Tokens();
 
 exports.signUp = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -25,12 +27,29 @@ exports.signUp = asyncHandler(async (req, res, next) => {
 
   const accessToken = generateToken.accessToken(newUser);
   const refreshToken = generateToken.refreshToken(newUser);
+   // Generate CSRF secret & token
+  const csrfSecret = tokens.secretSync();
+  const csrfToken = tokens.create(csrfSecret);
 
   const id =newUser._id;
   res.cookie("jwt", refreshToken, {
     httpOnly: true,
     secure: true,
     maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: 'Strict'
+  });
+
+    res.cookie("csrf_secret", csrfSecret, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Strict',
+  });
+
+  // Send CSRF token to frontend in a readable cookie
+  res.cookie("csrf_token", csrfToken, {
+    httpOnly: false,
+    secure: true,
+    sameSite: 'Strict',
   });
 
   res.json({ accessToken, email,id });
@@ -50,10 +69,28 @@ exports.login = asyncHandler(async (req, res, next) => {
   const accessToken = generateToken.accessToken(user);
   const refreshToken = generateToken.refreshToken(user);
 
+   // Generate CSRF secret & token
+  const csrfSecret = tokens.secretSync();
+  const csrfToken = tokens.create(csrfSecret);
+
   res.cookie("jwt", refreshToken, {
     httpOnly: true,
     secure: true,
     maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: 'Strict'
+  });
+
+    res.cookie("csrf_secret", csrfSecret, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Strict',
+  });
+
+  // Send CSRF token to frontend in a readable cookie
+  res.cookie("csrf_token", csrfToken, {
+    httpOnly: false,
+    secure: true,
+    sameSite: 'Strict',
   });
 
   res.json({ accessToken, user});
@@ -161,3 +198,4 @@ exports.logout = asyncHandler(async (req, res, next) => {
   });
   res.json({ message: "logged out" });
 });
+

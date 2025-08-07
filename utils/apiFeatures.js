@@ -11,7 +11,6 @@ class ApiFeatures {
     excludesFields.forEach((field) => delete queryObj[field]);
 
     const parsed = Object.entries(queryObj).reduce((acc, [key, val]) => {
-
       const match = key.match(/^(\w+)\[(gte|gt|lte|lt)\]$/);
 
       if (match) {
@@ -27,48 +26,47 @@ class ApiFeatures {
     return this;
   }
 
-    search(ModelName) {
+  search(ModelName) {
     if (this.query.keyword) {
-      if (ModelName === "services"||ModelName === "Categories") {
+      if (ModelName === "services" || ModelName === "Categories") {
         const keywordQuery = {
           $or: [
             { name: { $regex: this.query.keyword, $options: "i" } },
             { description: { $regex: this.query.keyword, $options: "i" } },
           ],
         };
-         this.mongoQuery = this.mongoQuery.find(keywordQuery);
+        this.mongoQuery = this.mongoQuery.find(keywordQuery);
       } else {
         const keywordQuery = {
           $or: [{ name: { $regex: this.query.keyword, $options: "i" } }],
         };
         this.mongoQuery = this.mongoQuery.find(keywordQuery);
       }
-
     }
     return this;
   }
 
-
   sort() {
-    if (typeof  this.query.sort=== 'string') {
+    console.log(this.query);
+    if (typeof this.query.sort === "string") {
       const sortBy = this.query.sort.split(",").join(" ");
       this.mongoQuery = this.mongoQuery.sort(sortBy);
+      // console.log( this.mongoQuery)
     } else {
-      // console.log(this.query.sort)
       this.mongoQuery = this.mongoQuery.sort("-createdAt");
     }
     return this;
   }
 
-    limitFields() {
-        if (this.query.fields) {
-        const fields = this.query.fields.split(",").join(" ");
-        this.mongoQuery = this.mongoQuery.select(fields);
-        } else {
-        this.mongoQuery = this.mongoQuery.select("-__v");
-        }
-        return this;
+  limitFields() {
+    if (this.query.fields) {
+      const fields = this.query.fields.split(",").join(" ");
+      this.mongoQuery = this.mongoQuery.select(fields);
+    } else {
+      this.mongoQuery = this.mongoQuery.select("-__v");
     }
+    return this;
+  }
 
   paginate(CountOfDocuments) {
     const page = this.query.page * 1 || 1;
@@ -97,7 +95,6 @@ class ApiFeatures {
     this.mongoQuery = this.mongoQuery.skip(skip).limit(limit);
     return this;
   }
-
 }
 
 module.exports = { ApiFeatures };

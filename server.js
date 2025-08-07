@@ -10,10 +10,16 @@ const { ApiError, HandleError } = require("./middleware/errorHandler");
 const {webhookCheckout}=require('./controllers/order')
 
 
- 
+
 const app = express();
 const port = process.env.PORT || 4000;
 
+//security 
+const applySecurity= require('./middleware/security');
+app.use(cookieParser());
+applySecurity(app)
+
+//---------
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
@@ -24,12 +30,10 @@ app.post(
 
 // Middlewares
 app.use(cors());
-app.use(cookieParser());
-app.use(express.json()); // Limit the size of JSON payloads
-app.use(express.urlencoded({  extended: true })); // Limit the size of URL-encoded payloads
+app.use(express.json({ limit: "10kb" })); // Limit the size of JSON payloads
+app.use(express.urlencoded({limit: "10kb" ,  extended: true })); // Limit the size of URL-encoded payloads
 app.use(express.static(path.join(__dirname, "uploads")));
  
-
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
