@@ -10,7 +10,7 @@ The goal of this project is to **implement most of the essential security princi
 ###  1. Use flat Promise chains
 - use async and await to be able to catch all erroes
 
-### 2. set request size limits 
+### 2. Set request size limits 
 - use (raw-body) package to control request body 
 
 ### 3. Do not block the event loop
@@ -38,7 +38,7 @@ The goal of this project is to **implement most of the essential security princi
 - use npm i express-rate-limit
 - for sensitive pages like login and signup....
 
-### 10.anti csrf 
+### 10. Anti csrf 
 - use => npm i csrf
 
 ### 11.Remove unnecessary routes 
@@ -50,13 +50,32 @@ The goal of this project is to **implement most of the essential security princi
 ### 13.Only return what is necessary
 - when querying and using user objects, you need to return only needed fields as it may be vulnerable to personal information disclosure.
 
-###  14. Global Error Handling
+
+###  14. Set cookie flags appropriately
+- like => httpOnly, Secure and SameSite
+
+###  15. Use appropriate security headers
+- use (helmet)  package
+- The helmet package can help to set some headers:
+- Helmet sets the following headers by default:
+- Content-Security-Policy: A powerful allow-list of what can happen on your page which mitigates many attacks
+- Cross-Origin-Opener-Policy: Helps process-isolate your page
+- Cross-Origin-Resource-Policy: Blocks others from loading your resources cross-origin
+- Origin-Agent-Cluster: Changes process isolation to be origin-based
+- Referrer-Policy: Controls the Referer header
+- Strict-Transport-Security: Tells browsers to prefer HTTPS
+- X-Content-Type-Options: Avoids MIME sniffing
+- X-DNS-Prefetch-Control: Controls DNS prefetching
+- X-Download-Options: Forces downloads to be saved (Internet Explorer only)
+- X-Frame-Options: Legacy header that mitigates clickjacking attacks
+- X-Permitted-Cross-Domain-Policies: Controls cross-domain behavior for Adobe products, like Acrobat
+- X-Powered-By: Info about the web server. Removed because it could be used in simple attacks
+- X-XSS-Protection: Legacy header that tries to mitigate XSS attacks, but makes things worse, so Helmet disables it
+
+###  16. Global Error Handling
 - Captures unhandled promise rejections:
 ```js
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled Rejection:", err.message);
   process.exit(1);
 });
-
-###  15. Global Error Handling
-- 
