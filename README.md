@@ -2,31 +2,77 @@
 
 ## 🎯 Project Goal
 
-The goal of this project is to **implement most of the essential security principles in a Node.js application**, to protect the system from common vulnerabilities such as XSS, CSRF, LFI, and more.
-
----
+The goal of this project is to **implement most of the essential security principles in a Node.js application**
+-
 
 ## ✅ Features Implemented
 
-### 🔐 1. Security Headers with Helmet
-- `helmet.hidePoweredBy()` – Hides the "X-Powered-By" header to prevent technology disclosure.
-- `helmet.noSniff()` – Prevents browsers from MIME-sniffing the response.
-- `helmet.xssFilter()` – Disables XSS Auditor (legacy browsers).
-- `Content-Security-Policy` – Strong CSP to prevent inline JavaScript and XSS attacks.
+###  1. Use flat Promise chains
+- use async and await to be able to catch all erroes
 
-### 🚫 2. Cache Control for Sensitive Pages
-- Used `nocache` middleware to prevent sensitive data from being cached by browsers.
+### 2. Set request size limits 
+- use (raw-body) package to control request body 
 
-### 📩 3. IE File Execution Protection
-- Used `helmet.ieNoOpen()` to prevent Internet Explorer from executing downloaded files in the site’s context.
+### 3. Do not block the event loop
 
-### 🔐 4. Data Exposure Minimization
-- Only returns specific fields from user or database objects to reduce the risk of exposing sensitive information.
+###  4.perform input validation
+- sanatize or clearup to input data befor validation layer
+- use =>manual sanatize
+- use (xxs npm )to protect from script input  and MongoDB injection
 
-### 🔄 5. Stripe Webhook Signature Verification
-- Uses `stripe.webhooks.constructEvent()` to validate webhook signatures and ensure secure integration.
+### 6.Perform output escaping
+- use escape-html from npm
+-  ex: const escapeHtml = require('escape-html');
+-    res.send(`<div>${escapeHtml(user.name)}</div>`);
 
-### ⚠️ 6. Global Error Handling
+### 7.Perform application activity logging
+- use escape-html from npm
+-  here are modules such as Winston, Bunyan, or Pino to perform application activity logging.
+
+### 8.Monitor the event loop
+- use toobusy-js  from npm => to mintor if event loop is busy
+- this package calc the busy by calc the lag, if lag = 70ms the package return true and send bust message
+
+### 9.Take precautions against (brute-forcing)
+- Attackers can use brute-forcing as a( password )guessing attack to obtain account passwords
+- use npm i express-rate-limit
+- for sensitive pages like login and signup....
+
+### 10. Anti csrf 
+- use => npm i csrf
+
+### 11.Remove unnecessary routes 
+
+### 12.Prevent HTTP Parameter Pollution
+- attack in which attackers send multiple HTTP parameters with the same name and this causes your application to interpret them unpredictably
+- hpp package solve this problem by select last parameter
+
+### 13.Only return what is necessary
+- when querying and using user objects, you need to return only needed fields as it may be vulnerable to personal information disclosure.
+
+
+###  14. Set cookie flags appropriately
+- like => httpOnly, Secure and SameSite
+
+###  15. Use appropriate security headers
+- use (helmet)  package
+- The helmet package can help to set some headers:
+- Helmet sets the following headers by default:
+- Content-Security-Policy: A powerful allow-list of what can happen on your page which mitigates many attacks
+- Cross-Origin-Opener-Policy: Helps process-isolate your page
+- Cross-Origin-Resource-Policy: Blocks others from loading your resources cross-origin
+- Origin-Agent-Cluster: Changes process isolation to be origin-based
+- Referrer-Policy: Controls the Referer header
+- Strict-Transport-Security: Tells browsers to prefer HTTPS
+- X-Content-Type-Options: Avoids MIME sniffing
+- X-DNS-Prefetch-Control: Controls DNS prefetching
+- X-Download-Options: Forces downloads to be saved (Internet Explorer only)
+- X-Frame-Options: Legacy header that mitigates clickjacking attacks
+- X-Permitted-Cross-Domain-Policies: Controls cross-domain behavior for Adobe products, like Acrobat
+- X-Powered-By: Info about the web server. Removed because it could be used in simple attacks
+- X-XSS-Protection: Legacy header that tries to mitigate XSS attacks, but makes things worse, so Helmet disables it
+
+###  16. Global Error Handling
 - Captures unhandled promise rejections:
 ```js
 process.on("unhandledRejection", (err) => {
