@@ -70,9 +70,30 @@ The goal of this project is to **implement most of the essential security princi
 - X-Frame-Options: Legacy header that mitigates clickjacking attacks
 - X-Permitted-Cross-Domain-Policies: Controls cross-domain behavior for Adobe products, like Acrobat
 - X-Powered-By: Info about the web server. Removed because it could be used in simple attacks
-- X-XSS-Protection: Legacy header that tries to mitigate XSS attacks, but makes things worse, so Helmet disables it
+###  16. Keep your packages up-to-date
+- Security of your application depends directly on how secure the third-party packages you use in your application are
+  
+###  17. Do not use dangerous functions
+- There are some JavaScript functions that are dangerous and should only be used where necessary or unavoidable.  
+- ex: eval() , child_process.exec ,fs module , vm module
 
-###  16. Global Error Handling
+###  18.Stay away from evil regexes
+- use => (safe-regegx )and  (vuln-regex-detector).
+
+###  19.Run security linters
+- use => (safe-regegx )and  (vuln-regex-detector).
+
+###  20.Run security linters
+- When developing code, keeping all security tips in mind can be really difficult
+- This is why there are Static Analysis Security Testing (SAST) tools
+-  ESLint and JSHint are commonly used SAST tools for JavaScript linting.
+-  
+###  21.Use strict mode => if you use javaScript not TypeScript
+- When developing code, keeping all security tips in mind can be really difficult
+- This is why there are Static Analysis Security Testing (SAST) tools
+-  ESLint and JSHint are commonly used SAST tools for JavaScript linting.
+-  
+###  22. Global Error Handling
 - Captures unhandled promise rejections:
 ```js
 process.on("unhandledRejection", (err) => {
