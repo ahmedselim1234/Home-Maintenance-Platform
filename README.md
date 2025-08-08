@@ -31,7 +31,7 @@ The goal of this project is to **implement most of the essential security princi
 
 ### 8.Monitor the event loop
 - use toobusy-js  from npm => to mintor if event loop is busy
-- this package calc the busy by calc the lag, if lag = 70ms the package return true and send bust message
+- this package calc the busy by calc the lag, if lag = 70ms the package return true and send busy message
 
 ### 9.Take precautions against (brute-forcing)
 - Attackers can use brute-forcing as a( password )guessing attack to obtain account passwords
